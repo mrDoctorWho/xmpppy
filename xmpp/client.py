@@ -370,5 +370,5 @@ class Component(CommonClient):
 				return "sasl"
 			else:
 				raise auth.NotAuthorized(self.SASL.startsasl)
-		except:
+		except Exception:
 			self.DEBUG(self.DBG, "Failed to authenticate %s" % name, "error")
