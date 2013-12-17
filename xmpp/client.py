@@ -126,7 +126,7 @@ class CommonClient:
 		"""
 		Default event handler. To be overriden.
 		"""
-		print "Event: ", (eventName, args)
+		print("Event: %s-%s" % (eventName, args))
 
 	def isConnected(self):
 		"""
