@@ -235,7 +235,7 @@ class SASL(PlugIn):
 			resp["realm"] = self._owner.Server
 			resp["nonce"] = chal["nonce"]
 			cnonce = ""
-			for i in range(7):
+			for i in xrange(7):
 				cnonce += hex(int(_random() * 65536 * 4096))[2:]
 			resp["cnonce"] = cnonce
 			resp["nc"] = ("00000001")
@@ -247,8 +247,8 @@ class SASL(PlugIn):
 			resp["response"] = response
 			resp["charset"] = "utf-8"
 			sasl_data = ""
-			for key in ["charset", "username", "realm", "nonce", "nc", "cnonce", "digest-uri", "response", "qop"]:
-				if key in ["nc", "qop", "response", "charset"]:
+			for key in ("charset", "username", "realm", "nonce", "nc", "cnonce", "digest-uri", "response", "qop"):
+				if key in ("nc", "qop", "response", "charset"):
 					sasl_data += "%s=%s," % (key, resp[key])
 				else:
 					sasl_data += "%s=\"%s\"," % (key, resp[key])

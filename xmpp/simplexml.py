@@ -301,7 +301,7 @@ class Node(object):
 		["text1", <nodea instance>, <nodeb instance>, " text2"].
 		"""
 		pl = []
-		for i in range(max(len(self.data), len(self.kids))):
+		for i in xrange(max(len(self.data), len(self.kids))):
 			if i < len(self.data) and self.data[i]:
 				pl.append(self.data[i])
 			if i < len(self.kids) and self.kids[i]:
