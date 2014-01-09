@@ -25,8 +25,6 @@ import xml.parsers.expat
 
 XML_ls = (
 	("&", "&amp;"),
-	("\x0C", ""),
-	("\x1B", ""),
 	("<", "&lt;"),
 	(">", "&gt;"),
 	('"', "&quot;"),
@@ -108,7 +106,7 @@ class Node(object):
 				self.nsp_cache[k] = v
 		for attr, val in attrs.items():
 			if attr == "xmlns":
-				self.nsd[u""] = val
+				self.nsd[""] = val
 			elif attr.startswith("xmlns:"):
 				self.nsd[attr[6:]] = val
 			self.attrs[attr] = attrs[attr]
@@ -216,7 +214,7 @@ class Node(object):
 		if namespace:
 			newnode.setNamespace(namespace)
 		self.kids.append(newnode)
-		self.data.append(u"")
+		self.data.append("")
 		return newnode
 
 	def addData(self, data):

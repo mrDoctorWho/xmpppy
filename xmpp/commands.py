@@ -258,7 +258,7 @@ class Command_Handler_Prototype(PlugIn):
 		"""
 		Returns an id for the command session.
 		"""
-		self.count = self.count + 1
+		self.count += 1
 		return "cmd-%s-%d" % (self.name, self.count)
 
 	def Execute(self, conn, request):
