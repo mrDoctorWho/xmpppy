@@ -215,20 +215,19 @@ class TCPsocket(PlugIn):
 			data = data.encode("utf-8")
 		elif not isinstance(data, str):
 			data = ustr(data).encode("utf-8")
-		while not select((), [self._sock], (), timeout)[1]:
+		while not select([], [self._sock], [], timeout)[1]:
 			pass
+		try:
+			self._send(data)
+		except Exception:
+			self.DEBUG("Socket error while sending data.", "error")
+			self._owner.disconnected()
 		else:
-			try:
-				self._send(data)
-			except Exception:
-				self.DEBUG("Socket error while sending data.", "error")
-				self._owner.disconnected()
-			else:
-				if not data.strip():
-					data = repr(data)
-				self.DEBUG(data, "sent")
-				if hasattr(self._owner, "Dispatcher"):
-					self._owner.Dispatcher.Event("", DATA_SENT, data)
+			if not data.strip():
+				data = repr(data)
+			self.DEBUG(data, "sent")
+			if hasattr(self._owner, "Dispatcher"):
+				self._owner.Dispatcher.Event("", DATA_SENT, data)
 
 	def pending_data(self, timeout=0):
 		"""
