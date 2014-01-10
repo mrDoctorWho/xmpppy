@@ -12,7 +12,7 @@
 ##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ##   GNU General Public License for more details.
 
-# $Id: transports.py, v1.36 2013/11/03 alkorgun Exp $
+# $Id: transports.py, v1.36 2014/01/10 alkorgun Exp $
 
 """
 This module contains the low-level implementations of xmpppy connect methods or
@@ -92,7 +92,9 @@ class TCPsocket(PlugIn):
 				dns__ = dns.Request()
 				response = dns__.req(query, qtype="SRV")
 				if response.answers:
-					(port, host) = response.answers[0]["data"][2:]
+					# Sort by priority, according to RFC 2782.
+					answers = sorted(response.answers, key=lambda a: a["data"][0])
+					(port, host) = answers[0]["data"][2:]
 					server = str(host), int(port)
 			except dns.DNSError:
 				self.DEBUG("An error occurred while looking up %s." % query, "warn")

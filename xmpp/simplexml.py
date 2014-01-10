@@ -12,7 +12,7 @@
 ##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ##   GNU General Public License for more details.
 
-# $Id: simplexml.py, v1.35 2013/10/21 alkorgun Exp $
+# $Id: simplexml.py, v1.36 2014/01/10 alkorgun Exp $
 
 """
 Simplexml module provides xmpppy library with all needed tools to handle
@@ -147,39 +147,39 @@ class Node(object):
 		if self.namespace:
 			if not self.parent or self.parent.namespace != self.namespace:
 				if "xmlns" not in self.attrs:
-					s = s + " xmlns=\"%s\"" % self.namespace
+					s += " xmlns=\"%s\"" % self.namespace
 		for key in self.attrs.keys():
 			val = ustr(self.attrs[key])
-			s = s + " %s=\"%s\"" % (key, XMLescape(val))
-		s = s + ">"
+			s += " %s=\"%s\"" % (key, XMLescape(val))
+		s += ">"
 		cnt = 0
 		if self.kids:
 			if fancy:
-				s = s + "\n"
+				s += "\n"
 			for a in self.kids:
 				if not fancy and (len(self.data) - 1) >= cnt:
-					s = s + XMLescape(self.data[cnt])
+					s += XMLescape(self.data[cnt])
 				elif (len(self.data) - 1) >= cnt:
-					s = s + XMLescape(self.data[cnt].strip())
+					s += XMLescape(self.data[cnt].strip())
 				if isinstance(a, Node):
-					s = s + a.__str__(fancy and fancy + 1)
+					s += a.__str__(fancy and fancy + 1)
 				elif a:
-					s = s + a.__str__()
-				cnt = cnt + 1
+					s += a.__str__()
+				cnt += 1
 		if not fancy and (len(self.data) - 1) >= cnt:
-			s = s + XMLescape(self.data[cnt])
+			s += XMLescape(self.data[cnt])
 		elif (len(self.data) - 1) >= cnt:
-			s = s + XMLescape(self.data[cnt].strip())
+			s += XMLescape(self.data[cnt].strip())
 		if not self.kids and s.endswith(">"):
 			s = s[:-1] + " />"
 			if fancy:
-				s = s + "\n"
+				s += "\n"
 		else:
 			if fancy and not self.data:
-				s = s + (fancy - 1) * 2 * " "
-			s = s + "</" + self.name + ">"
+				s += (fancy - 1) * 2 * " "
+			s += "</" + self.name + ">"
 			if fancy:
-				s = s + "\n"
+				s += "\n"
 		return s
 
 	def getCDATA(self):
@@ -191,12 +191,12 @@ class Node(object):
 		cnt = 0
 		if self.kids:
 			for a in self.kids:
-				s = s + self.data[cnt]
+				s += self.data[cnt]
 				if a:
-					s = s + a.getCDATA()
-				cnt = cnt + 1
+					s += a.getCDATA()
+				cnt += 1
 		if (len(self.data) - 1) >= cnt:
-			s = s + self.data[cnt]
+			s += self.data[cnt]
 		return s
 
 	def addChild(self, name=None, attrs={}, payload=[], namespace=None, node=None):
