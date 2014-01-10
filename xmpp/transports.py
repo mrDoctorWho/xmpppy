@@ -29,6 +29,8 @@ Also exception 'error' is defined to allow capture of this module specific excep
 
 import sys
 import socket
+if sys.hexversion >= 0x20600F0:
+	import ssl
 import dispatcher
 
 from base64 import encodestring
@@ -132,21 +134,29 @@ class TCPsocket(PlugIn):
 
 	def connect(self, server=None):
 		"""
-		Try to connect to the given host/port. Does not lookup for SRV record.
+		Try to connect to the given host/port.
 		Returns non-empty string on success.
 		"""
 		if not server:
 			server = self._server
 		host, port = server
-		server = (host, int(port))
-		if ":" in host:
-			sock = socket.AF_INET6
-			server = server.__add__((0, 0))
-		else:
-			sock = socket.AF_INET
+		socktype = socket.SOCK_STREAM
 		try:
-			self._sock = socket.socket(sock, socket.SOCK_STREAM)
-			self._sock.connect(server)
+			if self.use_srv:
+				raise Exception()
+			lookup = socket.getaddrinfo(host, int(port), 0, socktype)[0]
+		except Exception:
+			addr = (host, int(port))
+			if ":" in host:
+				af = socket.AF_INET6
+				addr = addr.__add__((0, 0))
+			else:
+				af = socket.AF_INET
+		else:
+			af, socktype, proto, cn, addr = lookup
+		try:
+			self._sock = socket.socket(af, socktype)
+			self._sock.connect(addr)
 			self._send = self._sock.sendall
 			self._recv = self._sock.recv
 		except socket.error as error:
@@ -383,9 +393,12 @@ class TLS(PlugIn):
 
 	def _startSSL(self):
 		tcpsock = self._owner.Connection
-		tcpsock._sslObj = socket.ssl(tcpsock._sock, None, None)
-		tcpsock._sslIssuer = tcpsock._sslObj.issuer()
-		tcpsock._sslServer = tcpsock._sslObj.server()
+		if sys.hexversion >= 0x20600F0:
+			tcpsock._sslObj = ssl.wrap_socket(tcpsock._sock, None, None)
+		else:
+			tcpsock._sslObj = socket.ssl(tcpsock._sock, None, None)
+			tcpsock._sslIssuer = tcpsock._sslObj.issuer()
+			tcpsock._sslServer = tcpsock._sslObj.server()
 		tcpsock._recv = tcpsock._sslObj.read
 		tcpsock._send = tcpsock._sslObj.write
 		tcpsock._seen_data = 1
