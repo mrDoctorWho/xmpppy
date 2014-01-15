@@ -153,7 +153,7 @@ class Dispatcher(PlugIn):
 			e = self._pendingExceptions.pop()
 			raise e[0], e[1], e[2]
 		conn = self._owner.Connection
-		recv, send = select([conn._sock], [conn._sock], [], timeout)[:2]
+		recv, send = select([conn._sock], [conn._sock] if conn._send_queue else [], [], timeout)[:2]
 		if send:
 			while conn._send_queue:
 				conn.send_now(conn._send_queue.pop(0))
