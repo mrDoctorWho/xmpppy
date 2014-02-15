@@ -66,8 +66,10 @@ class SendSemaphore(object):
 
 	def acquire(self, blocking=1):
 		rc = self.__lock.acquire(blocking)
-		if blocking and self.interval and time.time() - self.__released < self.interval:
-			time.sleep(self.interval)
+		if blocking and self.interval:
+			elapsed = time.time() - self.__released
+			if elapsed < self.interval:
+				time.sleep(self.interval - elapsed)
 		return rc
 
 	__enter__ = acquire
