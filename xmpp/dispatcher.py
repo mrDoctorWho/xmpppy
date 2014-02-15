@@ -35,6 +35,16 @@ ID = 0
 
 DBG_LINE = "dispatcher"
 
+if sys.hexversion >= 0x30000F0:
+
+	def deferredRaise(e):
+		raise e[0](e[1]).with_traceback(e[2])
+
+else:
+
+	def deferredRaise(e):
+		raise e[0], e[1], e[2]
+
 class Dispatcher(PlugIn):
 	"""
 	Ancestor of PlugIn class. Handles XMPP stream, i.e. aware of stream headers.
@@ -150,16 +160,10 @@ class Dispatcher(PlugIn):
 		for handler in self._cycleHandlers:
 			handler(self)
 		if self._pendingExceptions:
-			e = self._pendingExceptions.pop()
-			raise e[0](e[1]).with_traceback(e[2])
-		conn = self._owner.Connection
-		recv, send = select([conn._sock], [conn._sock] if conn._send_queue else [], [], timeout)[:2]
-		if send:
-			while conn._send_queue:
-				conn.send_now(conn._send_queue.pop(0))
-		if recv:
+			deferredRaise(self._pendingExceptions.pop())
+		if self._owner.Connection.pending_data(timeout):
 			try:
-				data = conn.receive()
+				data = self._owner.Connection.receive()
 			except IOError:
 				return None
 			try:
@@ -167,8 +171,7 @@ class Dispatcher(PlugIn):
 			except ExpatError:
 				pass
 			if self._pendingExceptions:
-				e = self._pendingExceptions.pop()
-				raise e[0](e[1]).with_traceback(e[2])
+				deferredRaise(self._pendingExceptions.pop())
 			if data:
 				return len(data)
 		return "0"
