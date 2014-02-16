@@ -12,7 +12,7 @@
 ##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ##   GNU General Public License for more details.
 
-# $Id: dispatcher.py, v1.44 2014/01/15 alkorgun Exp $
+# $Id: dispatcher.py, v1.45 2014/02/16 alkorgun Exp $
 
 """
 Main xmpppy mechanism. Provides library with methods to assign different handlers
@@ -110,7 +110,8 @@ class Dispatcher(PlugIn):
 		self._init()
 		for method in self._old_owners_methods:
 			if method.__name__ == "send":
-				self._owner_send = method; break
+				self._owner_send = method
+				break
 		self._owner.lastErrNode = None
 		self._owner.lastErr = None
 		self._owner.lastErrCode = None

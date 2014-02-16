@@ -12,7 +12,7 @@
 ##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ##   GNU General Public License for more details.
 
-# $Id: transports.py, v1.37 2014/01/15 alkorgun Exp $
+# $Id: transports.py, v1.38 2014/02/16 alkorgun Exp $
 
 """
 This module contains the low-level implementations of xmpppy connect methods or
@@ -61,7 +61,7 @@ class SendSemaphore(object):
 		self.__released = 0
 		self.interval = SEND_INTERVAL
 
-	def set_inteval(self, interval):
+	def set_send_interval(self, interval):
 		self.interval = interval
 
 	def acquire(self, blocking=1):
@@ -111,7 +111,7 @@ class TCPsocket(PlugIn):
 		PlugIn.__init__(self)
 		self.DBG_LINE = "socket"
 		self._sequence = SendSemaphore()
-		self.set_send_interval = self._sequence.set_inteval
+		self.set_send_interval = self._sequence.set_send_interval
 		self._exported_methods = [self.send, self.disconnect, self.set_send_interval]
 		self._server, self.use_srv = server, use_srv
 
