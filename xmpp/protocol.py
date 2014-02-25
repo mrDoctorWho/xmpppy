@@ -837,11 +837,11 @@ class Iq(Protocol):
 		if queryNS:
 			self.setQueryNS(queryNS)
 
-	def getQuery(self):
+	def getQuery(self, namespace=None):
 		"""
 		Returns the query node.
 		"""
-		return self.getTag("query")
+		return self.getTag("query", namespace=namespace)
 
 	def getQueryNS(self):
 		"""

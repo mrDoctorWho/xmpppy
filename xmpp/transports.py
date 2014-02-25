@@ -128,7 +128,7 @@ class TCPsocket(PlugIn):
 				if response.answers:
 					# Sort by priority, according to RFC 2782.
 					answers = sorted(response.answers, key=lambda a: a["data"][0])
-					(port, host) = answers[0]["data"][2:]
+					(port, host) = answers[0]["data"][2:][:2]
 					server = str(host), int(port)
 			except dns.DNSError:
 				self.DEBUG("An error occurred while looking up %s." % query, "warn")
