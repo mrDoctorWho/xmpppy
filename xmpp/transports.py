@@ -43,7 +43,7 @@ from .protocol import *
 
 # http://pydns.sourceforge.net
 try:
-	import dns
+	import DNS as dns
 except ImportError:
 	dns = None
 
