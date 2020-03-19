@@ -76,7 +76,10 @@ NS_COMPRESS			 = "http://jabber.org/protocol/compress"					# XEP-0138
 NS_DATA				 = "jabber:x:data"											# XEP-0004
 NS_DATA_LAYOUT		 = "http://jabber.org/protocol/xdata-layout"				# XEP-0141
 NS_DATA_VALIDATE	 = "http://jabber.org/protocol/xdata-validate"				# XEP-0122
-NS_DELAY			 = "jabber:x:delay"											# XEP-0091 (deprecated)
+NS_DELAY		 	 = "jabber:x:delay"											# XEP-0091 (deprecated in favour of XEP-0203)
+NS_URN_DELAY		 = "urn:xmpp:delay"											# XEP-0203
+
+
 NS_DIALBACK			 = "jabber:server:dialback"									# RFC 3921
 NS_DISCO			 = "http://jabber.org/protocol/disco"						# XEP-0030
 NS_DISCO_INFO					 = NS_DISCO + "#info"							# XEP-0030
@@ -521,14 +524,15 @@ class Protocol(Node):
 		if node and isinstance(node, self.__class__) and self.__class__ == node.__class__ and "id" in self.attrs:
 			del self.attrs["id"]
 		self.timestamp = None
-		for x in self.getTags("x", namespace=NS_DELAY):
-			try:
-				if not self.getTimestamp() or x.getAttr("stamp") < self.getTimestamp():
-					self.setTimestamp(x.getAttr("stamp"))
-			except Exception:
-				pass
+
+		delay = self.getTag("delay", namespace=NS_URN_DELAY) or self.getTag("x", namespace=NS_DELAY)
+		if delay:
+			if not self.getTimestamp() or delay.getAttr("stamp") < self.getTimestamp():
+				self.setTimestamp(delay.getAttr("stamp")) 
+
 		if timestamp is not None:
 			self.setTimestamp(timestamp) # To auto-timestamp stanza just pass timestamp=""
+
 
 	def getTo(self):
 		"""
