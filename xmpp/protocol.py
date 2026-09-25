@@ -477,11 +477,11 @@ class Presence(Protocol):
         self.setTagData('status',val)
 
     def _muc_getItemAttr(self,tag,attr):
-        for xtag in self.getTags('x'):
+        for xtag in self.getTags('x',namespace=NS_MUC_USER):
             for child in xtag.getTags(tag):
                 return child.getAttr(attr)
     def _muc_getSubTagDataAttr(self,tag,attr):
-        for xtag in self.getTags('x'):
+        for xtag in self.getTags('x',namespace=NS_MUC_USER):
             for child in xtag.getTags('item'):
                 for cchild in child.getTags(tag):
                     return cchild.getData(),cchild.getAttr(attr)
