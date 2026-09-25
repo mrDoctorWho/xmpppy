@@ -408,9 +408,9 @@ class NodeBuilder:
             ns = self._document_nsp.get(nsp, 'http://www.gajim.org/xmlns/undeclared-root')
             try:
                 self.stream_header_received(ns, name, attrs)
-            except ValueError as e:
+            except ValueError:
                 self._document_attrs = None
-                raise ValueError(str(e))
+                raise
         if not self.last_is_data and self._ptr.parent:
             self._ptr.parent.data.append('')
         self.last_is_data = 0
@@ -420,7 +420,7 @@ class NodeBuilder:
         self.DEBUG(DBG_NODEBUILDER, "DEPTH -> %i , tag -> %s" % (self.__depth, tag), 'up')
         self.check_data_buffer()
         if self.__depth == self._dispatch_depth:
-            if self._mini_dom.getName() == 'error':
+            if self._mini_dom and self._mini_dom.getName() == 'error':
                 self.streamError = self._mini_dom.getChildren()[0].getName()
             self.dispatch(self._mini_dom)
         elif self.__depth > self._dispatch_depth:

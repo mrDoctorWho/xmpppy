@@ -379,5 +379,6 @@ class Dispatcher(PlugIn):
 
     def disconnect(self):
         """ Send a stream terminator and and handle all incoming stanzas before stream closure. """
-        self._owner_send('</stream:stream>')
-        while self.Process(1): pass
+        if self._owner.connected:
+            self._owner_send('</stream:stream>')
+            while self.Process(1): pass

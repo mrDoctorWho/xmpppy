@@ -202,6 +202,8 @@ class Client(CommonClient):
             Returns '' or 'tcp' or 'tls', depending on the result."""
         if not CommonClient.connect(self,server,proxy,secure,use_srv,transport) or secure!=None and not secure: return self.connected
         transports.TLS().PlugIn(self)
+        if not hasattr(self, 'Dispatcher'):
+            return
         if 'version' not in self.Dispatcher.Stream._document_attrs or not self.Dispatcher.Stream._document_attrs['version']=='1.0': return self.connected
         while not self.Dispatcher.Stream.features and self.Process(1): pass      # If we get version 1.0 stream the features tag MUST BE presented
         if not self.Dispatcher.Stream.features.getTag('starttls'): return self.connected       # TLS not supported by server

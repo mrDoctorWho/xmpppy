@@ -175,7 +175,8 @@ class TCPsocket(PlugIn):
     def plugout(self):
         """ Disconnect from the remote server and unregister self.disconnected method from
             the owner's dispatcher. """
-        self._sock.close()
+        if getattr(self, '_sock', None):
+            self._sock.close()
         if 'Connection' in self._owner.__dict__:
             del self._owner.Connection
             self._owner.UnregisterDisconnectHandler(self.disconnected)

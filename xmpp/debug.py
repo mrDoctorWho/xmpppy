@@ -177,8 +177,8 @@ class Debug:
             if isinstance(log_file, string_types):
                 try:
                     self._fh = open(log_file,'w')
-                except:
-                    print('ERROR: can open %s for writing')
+                except Exception:
+                    print('ERROR: cannot open %s for writing.' % log_file)
                     sys.exit(0)
             else: ## assume its a stream type object
                 self._fh = log_file
