@@ -217,6 +217,12 @@ del ns,errname,errpool,err,cond,code,typ,text
 def isResultNode(node):
     """ Returns true if the node is a positive reply. """
     return node and node.getType()=='result'
+def isGetNode(node):
+    """ Returns true if the node is an IQ get request. """
+    return node and node.getType()=='get'
+def isSetNode(node):
+    """ Returns true if the node is an IQ set request. """
+    return node and node.getType()=='set'
 def isErrorNode(node):
     """ Returns true if the node is a negative reply. """
     return node and node.getType()=='error'
@@ -527,8 +533,10 @@ class Iq(Protocol):
         Protocol.__init__(self, 'iq', to=to, typ=typ, attrs=attrs, frm=frm, xmlns=xmlns, node=node)
         if payload: self.setQueryPayload(payload)
         if queryNS: self.setQueryNS(queryNS)
-    def getQuery(self):
-        """ Return the IQ's child element if it exists, None otherwise."""
+    def getQuery(self, namespace=None):
+        """ Return the IQ's child element if it exists, optionally filtering query elements by namespace."""
+        if namespace is not None:
+            return self.getTag('query', namespace=namespace)
         typ = self.getType()
         query=None
         for child in self.getChildren():
