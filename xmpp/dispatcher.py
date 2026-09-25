@@ -296,9 +296,8 @@ class Dispatcher(PlugIn):
         output=''
         if ID in session._expected:
             user=0
-            if type(session._expected[ID])==type(()):
-                cb,args=session._expected[ID]
-                del session._expected[ID]
+            if isinstance(session._expected[ID], tuple):
+                cb,args=session._expected.pop(ID)
                 session.DEBUG("Expected stanza arrived. Callback %s(%s) found!"%(cb,args),'ok')
                 try: cb(session,stanza,**args)
                 except NodeProcessed:
@@ -324,18 +323,20 @@ class Dispatcher(PlugIn):
             If operation failed for some reason then owner's attributes
             lastErrNode, lastErr and lastErrCode are set accordingly. """
         self._expected[ID]=None
-        has_timed_out=0
-        abort_time=time.time() + timeout
-        self.DEBUG("Waiting for ID:%s with timeout %s..." % (ID,timeout),'wait')
-        while not self._expected[ID]:
-            if not self.Process(0.04):
-                self._owner.lastErr="Disconnect"
-                return None
-            if time.time() > abort_time:
-                self._owner.lastErr="Timeout"
-                return None
-        response=self._expected[ID]
-        del self._expected[ID]
+        try:
+            has_timed_out=0
+            abort_time=time.time() + timeout
+            self.DEBUG("Waiting for ID:%s with timeout %s..." % (ID,timeout),'wait')
+            while not self._expected[ID]:
+                if not self.Process(0.04):
+                    self._owner.lastErr="Disconnect"
+                    return None
+                if time.time() > abort_time:
+                    self._owner.lastErr="Timeout"
+                    return None
+            response=self._expected.pop(ID)
+        finally:
+            self._expected.pop(ID, None)
         if response.getErrorCode():
             self._owner.lastErrNode=response
             self._owner.lastErr=response.getError()
