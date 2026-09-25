@@ -97,13 +97,13 @@ class CommonClient:
             or "exclude" list. The latter is done via adding "always" pseudo-ID to the list.
             Full list: ['nodebuilder', 'dispatcher', 'gen_auth', 'SASL_auth', 'bind', 'socket',
              'CONNECTproxy', 'TLS', 'roster', 'browser', 'ibb'] . """
-        if self.__class__.__name__=='Client': self.Namespace,self.DBG='jabber:client',DBG_CLIENT
-        elif self.__class__.__name__=='Component': self.Namespace,self.DBG=dispatcher.NS_COMPONENT_ACCEPT,DBG_COMPONENT
+        if isinstance(self, Client): self.Namespace,self.DBG='jabber:client',DBG_CLIENT
+        elif isinstance(self, Component): self.Namespace,self.DBG=dispatcher.NS_COMPONENT_ACCEPT,DBG_COMPONENT
         self.defaultNamespace=self.Namespace
         self.disconnect_handlers=[]
         self.Server=server
         self.Port=port
-        if debug and type(debug)!=list: debug=['always', 'nodebuilder']
+        if debug and not isinstance(debug, list): debug=['always', 'nodebuilder']
         self._DEBUG=Debug.Debug(debug)
         self.DEBUG=self._DEBUG.Show
         self.debug_flags=self._DEBUG.debug_flags

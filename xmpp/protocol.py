@@ -20,6 +20,7 @@ xmpp-related data structures.
 """
 
 from .simplexml import Node,ustr
+from six import string_types
 import time
 NS_ACTIVITY         ='http://jabber.org/protocol/activity'                  # XEP-0108
 NS_ADDRESS          ='http://jabber.org/protocol/address'                   # XEP-0033
@@ -273,7 +274,7 @@ class JID:
             JID(node='node',domain='domain.org')
         """
         if not jid and not domain: raise ValueError('JID must contain at least domain name')
-        elif type(jid)==type(self): self.node,self.domain,self.resource=jid.node,jid.domain,jid.resource
+        elif isinstance(jid, self.__class__): self.node,self.domain,self.resource=jid.node,jid.domain,jid.resource
         elif domain: self.node,self.domain,self.resource=node,domain,resource
         else:
             if jid.find('@')+1: self.node,jid=jid.split('@',1)
@@ -391,7 +392,7 @@ class Protocol(Node):
         if code:
             if str(code) in list(_errorcodes.keys()): error=ErrorNode(_errorcodes[str(code)],text=error)
             else: error=ErrorNode(ERR_UNDEFINED_CONDITION,code=code,typ='cancel',text=error)
-        elif type(error) in [type(''),type('')]: error=ErrorNode(error)
+        elif isinstance(error, string_types): error=ErrorNode(error)
         self.setType('error')
         self.addChild(node=error)
     def setTimestamp(self,val=None):
@@ -612,7 +613,7 @@ class DataField(Node):
             """
         Node.__init__(self,'field',node=node)
         if name: self.setVar(name)
-        if type(value) in [list,tuple]: self.setValues(value)
+        if isinstance(value, (list, tuple)): self.setValues(value)
         elif value: self.setValue(value)
         if typ: self.setType(typ)
         elif not typ and not node: self.setType('text-single')
@@ -670,7 +671,7 @@ class DataField(Node):
         for opt in lst: self.addOption(opt)
     def addOption(self,opt):
         """ Add one more label-option pair to this field."""
-        if type(opt) in [str,str]: self.addChild('option').setTagData('value',opt)
+        if isinstance(opt, string_types): self.addChild('option').setTagData('value',opt)
         else: self.addChild('option',{'label':opt[0]}).setTagData('value',opt[1])
     def getType(self):
         """ Get type of this field. """
@@ -815,15 +816,15 @@ class DataForm(Node):
         if typ: self.setType(typ)
         self.setNamespace(NS_DATA)
         if title: self.setTitle(title)
-        if type(data)==type({}):
+        if isinstance(data, dict):
             newdata=[]
             for name in list(data.keys()): newdata.append(DataField(name,data[name]))
             data=newdata
         for child in data:
-            if type(child) in [type(''),type('')]: self.addInstructions(child)
-            elif child.__class__.__name__=='DataField': self.kids.append(child)
-            elif child.__class__.__name__=='DataItem': self.kids.append(child)
-            elif child.__class__.__name__=='DataReported': self.kids.append(child)
+            if isinstance(child, string_types): self.addInstructions(child)
+            elif isinstance(child, DataField): self.kids.append(child)
+            elif isinstance(child, DataItem): self.kids.append(child)
+            elif isinstance(child, DataReported): self.kids.append(child)
             else: self.kids.append(DataField(node=child))
     def getType(self):
         """ Return the type of dataform. """

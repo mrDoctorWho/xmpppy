@@ -25,6 +25,7 @@ import time,sys
 from . import simplexml
 from .protocol import *
 from .client import PlugIn
+from six import string_types
 
 DefaultTimeout=25
 ID=0
@@ -272,7 +273,8 @@ class Dispatcher(PlugIn):
         else:
             self.DEBUG("Got %s/%s stanza"%(xmlns,name), 'ok')
 
-        if stanza.__class__.__name__=='Node': stanza=self.handlers[xmlns][name][type](node=stanza)
+        if isinstance(stanza, Node) and not isinstance(stanza, Protocol):
+            stanza=self.handlers[xmlns][name][type](node=stanza)
 
         typ=stanza.getType()
         if not typ: typ=''
@@ -352,7 +354,7 @@ class Dispatcher(PlugIn):
     def send(self,stanza):
         """ Serialise stanza and put it on the wire. Assign an unique ID to it before send.
             Returns assigned ID."""
-        if type(stanza) in [type(''), type('')]: return self._owner_send(stanza)
+        if isinstance(stanza, string_types): return self._owner_send(stanza)
         if not isinstance(stanza,Protocol): _ID=None
         elif not stanza.getID():
             global ID

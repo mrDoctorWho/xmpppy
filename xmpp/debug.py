@@ -43,7 +43,7 @@ import sys
 import traceback
 import time
 import os
-from six import ensure_str
+from six import ensure_str, string_types
 
 import types
 
@@ -174,7 +174,7 @@ class Debug:
 
         self._remove_dupe_flags()
         if log_file:
-            if type( log_file ) is type(''):
+            if isinstance(log_file, string_types):
                 try:
                     self._fh = open(log_file,'w')
                 except:
@@ -206,7 +206,7 @@ class Debug:
                                                    mod_name ))
             self.show(' flags defined: %s' % ','.join( self.active ))
 
-        if type(flag_show) in (type(''), type(None)):
+        if isinstance(flag_show, string_types + (type(None),)):
             self.flag_show = flag_show
         else:
             msg2 = '%s' % type(flag_show )
@@ -299,7 +299,7 @@ class Debug:
             return 1
         else:
             # check for multi flag type:
-            if type( flag ) in ( type(()), type([]) ):
+            if isinstance(flag, (tuple, list)):
                 for s in flag:
                     if s in self.active:
                         return 1
@@ -313,7 +313,7 @@ class Debug:
         if not active_flags:
             #no debuging at all
             self.active = []
-        elif type( active_flags ) in ( tuple, list ):
+        elif isinstance(active_flags, (tuple, list)):
             flags = self._as_one_list( active_flags )
             for t in flags:
                 if t not in self.debug_flags:
@@ -351,11 +351,11 @@ class Debug:
 
         This code organises lst and remves dupes
         """
-        if type( items ) != type( [] ) and type( items ) != type( () ):
+        if not isinstance(items, (list, tuple)):
             return [ items ]
         r = []
         for l in items:
-            if type( l ) == type([]):
+            if isinstance(l, list):
                 lst2 = self._as_one_list( l )
                 for l2 in lst2:
                     self._append_unique_str(r, l2 )
@@ -368,7 +368,7 @@ class Debug:
 
     def _append_unique_str( self, lst, item ):
         """filter out any dupes."""
-        if type(item) != type(''):
+        if not isinstance(item, string_types):
             msg2 = '%s' % item
             raise Exception('Invalid item type (should be string)',msg2)
         if item not in lst:
