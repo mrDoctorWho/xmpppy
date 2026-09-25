@@ -728,12 +728,12 @@ class DataReported(Node):
     def getField(self,name):
         """ Return the datafield object with name 'name' (if exists). """
         return self.getTag('field',attrs={'var':name})
-    def setField(self,name,typ=None,label=None):
+    def setField(self,name,typ=None,label=None,desc=None,options=None):
         """ Create if nessessary or get the existing datafield object with name 'name' and return it.
-            If created, attributes 'type' and 'label' are applied to new datafield."""
+            If created, its metadata is applied to the new datafield."""
         f=self.getField(name)
         if f: return f
-        return self.addChild(node=DataField(name,None,typ,0,label))
+        return self.addChild(node=DataField(name,None,typ,0,label,desc=desc,options=options))
     def asDict(self):
         """ Represent dataitem as simple dictionary mapping of datafield names to their values."""
         ret={}
@@ -776,11 +776,11 @@ class DataItem(Node):
     def getField(self,name):
         """ Return the datafield object with name 'name' (if exists). """
         return self.getTag('field',attrs={'var':name})
-    def setField(self,name):
+    def setField(self,name,value=None,typ=None,desc=None,options=None):
         """ Create if nessessary or get the existing datafield object with name 'name' and return it. """
         f=self.getField(name)
         if f: return f
-        return self.addChild(node=DataField(name))
+        return self.addChild(node=DataField(name,value,typ,desc=desc,options=options))
     def asDict(self):
         """ Represent dataitem as simple dictionary mapping of datafield names to their values."""
         ret={}
@@ -868,11 +868,11 @@ class DataForm(Node):
     def getField(self,name):
         """ Return the datafield object with name 'name' (if exists). """
         return self.getTag('field',attrs={'var':name})
-    def setField(self,name):
+    def setField(self,name,value=None,typ=None,desc=None,options=None):
         """ Create if nessessary or get the existing datafield object with name 'name' and return it. """
         f=self.getField(name)
         if f: return f
-        return self.addChild(node=DataField(name))
+        return self.addChild(node=DataField(name,value,typ,desc=desc,options=options))
     def asDict(self):
         """ Represent dataform as simple dictionary mapping of datafield names to their values."""
         ret={}
