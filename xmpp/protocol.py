@@ -19,7 +19,7 @@ Protocol module contains tools that is needed for processing of
 xmpp-related data structures.
 """
 
-from .simplexml import Node,ustr
+from .simplexml import Node,XMLescape,ustr
 from six import string_types
 import time
 NS_ACTIVITY         ='http://jabber.org/protocol/activity'                  # XEP-0108
