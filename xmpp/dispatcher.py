@@ -301,8 +301,8 @@ class Dispatcher(PlugIn):
                 del session._expected[ID]
                 session.DEBUG("Expected stanza arrived. Callback %s(%s) found!"%(cb,args),'ok')
                 try: cb(session,stanza,**args)
-                except Exception as typ:
-                    if typ.__class__.__name__!='NodeProcessed': raise
+                except NodeProcessed:
+                    pass
             else:
                 session.DEBUG("Expected stanza arrived!",'ok')
                 session._expected[ID]=stanza
@@ -311,11 +311,11 @@ class Dispatcher(PlugIn):
             if user or handler['system']:
                 try:
                     handler['func'](session,stanza)
-                except Exception as typ:
-                    if typ.__class__.__name__!='NodeProcessed':
-                        self._pendingExceptions.insert(0, sys.exc_info())
-                        return
+                except NodeProcessed:
                     user=0
+                except Exception:
+                    self._pendingExceptions.insert(0, sys.exc_info())
+                    return
         if user and self._defaultHandler: self._defaultHandler(session,stanza)
 
     def WaitForResponse(self, ID, timeout=DefaultTimeout):
