@@ -237,14 +237,17 @@ class TCPsocket(PlugIn):
                     if self.check_pending(e, 'sending', 'waiting to retry'):
                         continue
                     raise
-            # Avoid printing messages that are empty keepalive packets.
-            if raw_data.strip():
-                self.DEBUG(raw_data,'sent')
-                if hasattr(self._owner, 'Dispatcher'): # HTTPPROXYsocket will send data before we have a Dispatcher
-                    self._owner.Dispatcher.Event('', DATA_SENT, raw_data)
-        except:
-            self.DEBUG("Socket error while sending data",'error')
-            self._owner.disconnected()
+        except socket.error as error:
+            self.DEBUG("Socket error while sending data: %s" % error,'error')
+            try:
+                self._owner.disconnected()
+            finally:
+                raise error
+        # Avoid printing messages that are empty keepalive packets.
+        if raw_data.strip():
+            self.DEBUG(raw_data,'sent')
+            if hasattr(self._owner, 'Dispatcher'): # HTTPPROXYsocket will send data before we have a Dispatcher
+                self._owner.Dispatcher.Event('', DATA_SENT, raw_data)
 
     def pending_data(self,timeout=0):
         """ Returns true if there is a data ready to be read. """
